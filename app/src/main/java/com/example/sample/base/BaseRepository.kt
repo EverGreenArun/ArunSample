@@ -16,7 +16,7 @@ open class BaseRepository{
             is GenericResponse.Success ->
                 data = result.data
             is GenericResponse.Error -> {
-                Log.d("1.DataRepository", "$errorMessage & Exception - ${result.exception}")
+                Log.d("RemoteDataRepository", "$errorMessage & Exception - ${result.exception}")
             }
         }
 

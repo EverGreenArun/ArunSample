@@ -1,25 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
-    <data>
-        <variable name="emptyMsg" type="String"/>
-    </data>
-    <LinearLayout
-            android:orientation="vertical"
-            android:background="@android:color/white"
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <FrameLayout
+            android:id="@+id/container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_post"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
-        <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/text_size_14"
-                android:text="@{emptyMsg}"/>
-    </LinearLayout>
+            android:layout_height="match_parent"/>
 </layout>
