@@ -2,7 +2,7 @@ package com.example.sample.pojo
 
 import com.google.gson.annotations.SerializedName
 
-data class Post(
+data class Poster(
     @SerializedName("id") var id: String?,
     @SerializedName("created_at") var createdAt: String?,
     @SerializedName("width") var width: Int?,

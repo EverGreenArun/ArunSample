@@ -6,6 +6,7 @@ import android.os.Environment;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import com.example.downloaderlib.downloaderlib2.Request;
+import com.example.sample.pojo.Poster;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,12 @@ public final class Data {
             request.setGroupId(groupId);
         }
         return requests;
+    }
+
+    public static Request getFetchRequest(final String url, final int groupId, Context context){
+        Request request = new Request(url, getFilePath(url, context));
+        request.setGroupId(groupId);
+        return request;
     }
 
     @NonNull

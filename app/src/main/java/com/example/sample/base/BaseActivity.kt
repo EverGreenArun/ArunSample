@@ -7,7 +7,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import com.example.sample.R
+import android.content.Intent
+import android.view.MenuItem
+
 
 abstract class BaseActivity<out V : ViewDataBinding> : AppCompatActivity() {
 
@@ -17,9 +19,24 @@ abstract class BaseActivity<out V : ViewDataBinding> : AppCompatActivity() {
 
     fun getDataBinding(): ViewDataBinding = dataBinding
 
-    fun setTitle(title: String) {
+    fun updateTitle(title: String) {
         actionBar?.title = title
         supportActionBar?.title = title
+    }
+
+    fun showActionBarBackButton(isShow :Boolean){
+        supportActionBar?.setDisplayShowHomeEnabled(isShow)
+        supportActionBar?.setDisplayHomeAsUpEnabled(isShow)
+    }
+
+    override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
+        when (menuItem.itemId) {
+            android.R.id.home -> {
+               onBackPressed()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(menuItem)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,9 +54,9 @@ abstract class BaseActivity<out V : ViewDataBinding> : AppCompatActivity() {
         return isConnected
     }
 
-    fun addFragment(fragment: BaseFragment<*, *>, tag: String) {
+    fun addFragment(containerId: Int, fragment: BaseFragment<*, *>, tag: String) {
         supportFragmentManager?.beginTransaction()
-            ?.add(R.id.container, fragment, tag)
+            ?.add(containerId, fragment, tag)
             ?.addToBackStack(tag)?.commit()
     }
 }

@@ -243,7 +243,6 @@ public final class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHold
             timeRemainingTextView = itemView.findViewById(R.id.remaining_TextView);
             downloadedBytesPerSecondTextView = itemView.findViewById(R.id.downloadSpeedTextView);
         }
-
     }
 
     public static class DownloadData {

@@ -16,15 +16,11 @@ abstract class BaseFragment<out V : ViewDataBinding, out T : BaseViewModel> : Fr
 
     abstract fun getDataBinding(inflater: LayoutInflater, container: ViewGroup?): ViewDataBinding
 
-    abstract fun setTitle()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setTitle()
-    }
+    abstract fun setActionBarTitle()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         mDataBinding = getDataBinding(inflater, container)
+        setActionBarTitle()
         return mDataBinding.root
     }
 

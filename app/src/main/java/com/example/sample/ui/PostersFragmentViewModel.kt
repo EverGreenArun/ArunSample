@@ -5,16 +5,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.sample.base.BaseViewModel
 import com.example.sample.network.ApiFactory
-import com.example.sample.pojo.Post
+import com.example.sample.pojo.Poster
 import com.example.sample.repo.PostRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class PostFragmentViewModel : BaseViewModel() {
+class PostersFragmentViewModel : BaseViewModel() {
     private val repository: PostRepo = PostRepo(ApiFactory.makeRetrofitService())
 
-    val posts: ArrayList<Post> = ArrayList()
+    val posters: ArrayList<Poster> = ArrayList()
 
     val liveData: MutableLiveData<Status> by lazy {
         MutableLiveData<Status>()
@@ -22,22 +22,29 @@ class PostFragmentViewModel : BaseViewModel() {
 
     var isApiCallSuccess: Boolean = true
 
-    fun fetchPosts() {
-        uiScope.launch {
-            isApiCallSuccess = true
-            fetchPostsBackGround()
-            liveData.value = if (isApiCallSuccess) {
-                Status.SUCCESS
-            } else {
-                Status.FAILURE
+    var pageCount = 0
+
+    fun fetchPosters() {
+        if (pageCount < 10) {
+            uiScope.launch {
+                isApiCallSuccess = true
+                fetchPostersInBackGround()
+                liveData.value = if (isApiCallSuccess) {
+                    pageCount += 1
+                    Status.SUCCESS
+                } else {
+                    Status.FAILURE
+                }
             }
+        } else {
+            liveData.value = Status.NO_MORE_DATA
         }
     }
 
-    private suspend fun fetchPostsBackGround() = withContext(Dispatchers.Default) {
-        val posts = repository.getPosts()
+    private suspend fun fetchPostersInBackGround() = withContext(Dispatchers.Default) {
+        val posts = repository.getPosters()
         posts?.let {
-            this@PostFragmentViewModel.posts.addAll(it)
+            this@PostersFragmentViewModel.posters.addAll(it)
             return@withContext
         }
         if (posts.isNullOrEmpty()) {
@@ -45,7 +52,7 @@ class PostFragmentViewModel : BaseViewModel() {
         }
     }
 
-    class PostFragmentViewModelFactory : ViewModelProvider.Factory {
+    class PostersFragmentViewModelFactory : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return modelClass.getConstructor().newInstance()
         }
@@ -53,5 +60,5 @@ class PostFragmentViewModel : BaseViewModel() {
 }
 
 enum class Status {
-    SUCCESS, FAILURE
+    SUCCESS, FAILURE, NO_MORE_DATA
 }
