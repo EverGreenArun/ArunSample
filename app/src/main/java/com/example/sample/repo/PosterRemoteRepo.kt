@@ -4,7 +4,7 @@ import com.example.sample.base.BaseRepository
 import com.example.sample.network.Api
 import com.example.sample.pojo.Poster
 
-class PostRepo(private val api: Api):BaseRepository() {
+class PosterRemoteRepo(private val api: Api):BaseRepository() {
     suspend fun getPosters() : ArrayList<Poster>?{
         return safeApiCall(
         call = { api.getPostersAsync().await()},

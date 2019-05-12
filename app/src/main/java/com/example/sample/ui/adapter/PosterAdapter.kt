@@ -9,6 +9,9 @@ import com.example.sample.base.BaseViewHolder
 import com.example.sample.databinding.ViewHolderPosterBinding
 import com.example.sample.pojo.Poster
 import com.example.sample.pojo.User
+import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.imagepipeline.request.ImageRequest
+import com.facebook.imagepipeline.request.ImageRequestBuilder
 
 class PostAdapter(var posters: ArrayList<Poster>, private val onItemClickLister: OnItemClickLister) :
     RecyclerView.Adapter<PostViewHolder>() {
@@ -38,14 +41,29 @@ class PostViewHolder(private val binding: ViewHolderPosterBinding, private val o
         binding.cardPost.setCardBackgroundColor(Color.parseColor(poster.color))
         binding.iVProfile.setOnClickListener { poster.user?.let { user -> onItemClickLister.onProfileClick(user) } }
         binding.btnWeb.setOnClickListener {
-            poster.links?.html?.let { uri ->
+            poster.posterLinks?.html?.let { uri ->
                 poster.user?.let { user ->
                     onItemClickLister.onWebClick(uri, user)
                 }
             }
         }
+
+
         poster.user?.profileImage?.medium?.let {
-            binding.iVProfile.setImageURI(Uri.parse(it))
+            val imageRequest:ImageRequest = ImageRequestBuilder
+                    .newBuilderWithSource(Uri.parse(it))
+                .setProgressiveRenderingEnabled(true)
+                .setLocalThumbnailPreviewsEnabled(true)
+                .build()
+
+            Fresco.getImagePipeline().prefetchToBitmapCache(imageRequest, binding.iVProfile.context)
+
+            binding.iVProfile.controller = Fresco.newDraweeControllerBuilder()
+                .setImageRequest(imageRequest)
+                .setOldController(binding.iVProfile.controller)
+                .setAutoPlayAnimations(false)
+                .build()
+
         }
         binding.executePendingBindings()
     }

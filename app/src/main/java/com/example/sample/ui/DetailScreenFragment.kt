@@ -33,7 +33,8 @@ class DetailScreenFragment : BaseFragment<ViewDataBinding, BaseViewModel>() {
     private lateinit var dataBinding: FragmentDetailScreenBinding
 
     private val viewModel by lazy {
-        ViewModelProviders.of(this, DetailScreenFragmentViewModel.DetailScreenFragmentViewModelFactory())
+        ViewModelProviders.of(this,
+            activity?.application?.let { DetailScreenFragmentViewModel.DetailScreenFragmentViewModelFactory(it) })
             .get(DetailScreenFragmentViewModel::class.java)
     }
 

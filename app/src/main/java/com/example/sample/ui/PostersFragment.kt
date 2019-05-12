@@ -1,6 +1,7 @@
 package com.example.sample.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,7 +30,8 @@ class PostersFragment : BaseFragment<ViewDataBinding, BaseViewModel>() {
     private lateinit var dataBinding: FragmentPostersBinding
     private lateinit var postAdapter: PostAdapter
     private val viewModel by lazy {
-        ViewModelProviders.of(this, PostersFragmentViewModel.PostersFragmentViewModelFactory())
+        ViewModelProviders.of(this,
+            activity?.application?.let { PostersFragmentViewModel.PostersFragmentViewModelFactory(it) })
             .get(PostersFragmentViewModel::class.java)
     }
     private var isLoading: Boolean = false
@@ -89,7 +91,7 @@ class PostersFragment : BaseFragment<ViewDataBinding, BaseViewModel>() {
         }
     }
 
-    private fun setPosterAdapter(){
+    private fun setPosterAdapter() {
         postAdapter = PostAdapter(viewModel.posters, object : OnItemClickLister {
             override fun onProfileClick(user: User) {
                 user.profileImage?.large?.let {
@@ -112,9 +114,15 @@ class PostersFragment : BaseFragment<ViewDataBinding, BaseViewModel>() {
             isLoading = true
             dataBinding.tVMessage.visibility = View.GONE
             viewModel.fetchPosters()
+            Log.i("loadData", "isNetworkConnected true")
         } else {
-            dataBinding.tVMessage.visibility = View.VISIBLE
-            dataBinding.tVMessage.text = getString(R.string.network_issue)
+            Log.i("loadData", "isNetworkConnected false")
+            showOfflineMessage()
+            if (!viewModel.offlineDataLoaded) {
+                Log.i("loadData", "offlineDataLoaded false")
+                viewModel.getAllPosters()
+                viewModel.offlineDataLoaded = true
+            }
         }
     }
 
@@ -126,6 +134,7 @@ class PostersFragment : BaseFragment<ViewDataBinding, BaseViewModel>() {
                         isLoading = false
                         postAdapter.notifyDataSetChanged()
                         dataBinding.tVMessage.visibility = View.GONE
+                        viewModel.offlineDataLoaded = false
                     }
                     Status.FAILURE -> {
                         isLoading = false
@@ -137,10 +146,23 @@ class PostersFragment : BaseFragment<ViewDataBinding, BaseViewModel>() {
                         dataBinding.tVMessage.visibility = View.VISIBLE
                         dataBinding.tVMessage.text = getString(R.string.no_more_data)
                     }
+                    Status.OLD_DATA -> {
+                        showOfflineMessage()
+                    }
                 }
             }
         }
         viewModel.liveData.observe(this, nameObserver)
+    }
+
+    private fun showOfflineMessage() {
+        dataBinding.tVMessage.visibility = View.VISIBLE
+        if (viewModel.posters.size == 0) {
+            dataBinding.tVMessage.text = getString(R.string.empty_offline_data)
+        } else {
+            dataBinding.tVMessage.text = getString(R.string.showing_offline_data)
+        }
+        postAdapter.notifyDataSetChanged()
     }
 }
 

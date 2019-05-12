@@ -6,5 +6,6 @@
     <string name="network_issue">Some issue on network, Please check connection</string>
     <string name="api_call_failure">Service currently unavailable</string>
     <string name="no_more_data">Already loaded all poster</string>
-
+    <string name="showing_offline_data">Now your seeing offline posters stored in device</string>
+    <string name="empty_offline_data">OfflineData also empty</string>
 </resources>
