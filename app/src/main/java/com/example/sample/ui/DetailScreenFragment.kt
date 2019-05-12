@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModelProviders
-import com.bumptech.glide.Glide
 import com.example.sample.base.BaseActivity
 import com.example.sample.base.BaseFragment
 import com.example.sample.base.BaseViewModel
@@ -58,25 +57,13 @@ class DetailScreenFragment : BaseFragment<ViewDataBinding, BaseViewModel>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.detailScreenData?.let {
-            when {
-                it.fileType == IMAGE_TYPE -> activity?.let { activity ->
-                    Glide.with(activity).load(it.fileUri).placeholder(com.example.sample.R.drawable.ic_wb_cloudy)
-                        .into(dataBinding.iVProfile)
-                    dataBinding.iVProfile.visibility = View.VISIBLE
-                }
-                isNetworkConnected() -> {
-                    dataBinding.webPage.visibility = View.VISIBLE
-
-                    dataBinding.webPage.settings.javaScriptEnabled = true // enable javascript
-                    dataBinding.webPage.settings.useWideViewPort = true
-                    dataBinding.webPage.settings.loadWithOverviewMode = true
-                    dataBinding.webPage.webViewClient = WebViewClient()
-                    dataBinding.webPage.loadUrl(it.fileUri)
-
-                }
-                else -> {
-
-                }
+            if (isNetworkConnected()) {
+                dataBinding.webPage.visibility = View.VISIBLE
+                dataBinding.webPage.settings.javaScriptEnabled = true
+                dataBinding.webPage.settings.useWideViewPort = true
+                dataBinding.webPage.settings.loadWithOverviewMode = true
+                dataBinding.webPage.webViewClient = WebViewClient()
+                dataBinding.webPage.loadUrl(it.fileUri)
             }
         }
     }

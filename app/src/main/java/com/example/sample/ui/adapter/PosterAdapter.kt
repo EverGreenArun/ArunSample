@@ -1,11 +1,10 @@
 package com.example.sample.ui.adapter
 
 import android.graphics.Color
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.example.sample.R
 import com.example.sample.base.BaseViewHolder
 import com.example.sample.databinding.ViewHolderPosterBinding
 import com.example.sample.pojo.Poster
@@ -45,8 +44,9 @@ class PostViewHolder(private val binding: ViewHolderPosterBinding, private val o
                 }
             }
         }
-        Glide.with(binding.root.context).load(poster.user?.profileImage?.medium)
-            .placeholder(R.drawable.ic_wb_cloudy).into(binding.iVProfile)
+        poster.user?.profileImage?.medium?.let {
+            binding.iVProfile.setImageURI(Uri.parse(it))
+        }
         binding.executePendingBindings()
     }
 }
