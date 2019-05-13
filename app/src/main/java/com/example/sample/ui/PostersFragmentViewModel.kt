@@ -16,36 +16,42 @@ import kotlinx.coroutines.withContext
 
 class PostersFragmentViewModel(application: Application) : BaseViewModel(application) {
     private val repository: PosterRemoteRepo = PosterRemoteRepo(ApiFactory.makeRetrofitService())
-
-    val posters: ArrayList<Poster> = ArrayList()
-
     val liveData: MutableLiveData<Status> by lazy {
         MutableLiveData<Status>()
     }
+    val posters: ArrayList<Poster> = ArrayList()
 
-    private var isApiCallSuccess: Boolean = true
-
-    private var pageCount = 0
+    private val maxPageCount = 10
+    private var numberOfPagesLoaded = 0
 
     var offlineDataLoaded: Boolean = false
 
-    fun fetchPosters() {
-        if (pageCount < 10) {
-            if (pageCount == 0) {
-                getAllPosters()
+
+    /**
+     *Loads data from remote or local storage
+     * */
+    fun getPosters() {
+        //Max page
+        if (numberOfPagesLoaded < maxPageCount) {
+            if (numberOfPagesLoaded == 0) {
+                //load older data from storage, till completing first remote call
+                getAllPostersFromLocalStorage()
             }
             uiScope.launch {
-                isApiCallSuccess = true
-                fetchPostersInBackGround()
-                liveData.value = if (isApiCallSuccess) {
-                    pageCount += 1
-                    if (pageCount == 1) {
-                        clearAllPosters()
-                        insertAllPoster(posters)
+                val list = getPostersFromRemoteStorage()
+                list?.let {
+                    //for first remote call success have to clear old data
+                    if (numberOfPagesLoaded == 0) {
+                        posters.clear()
+                        clearAllPostersInLocalStorage()
                     }
-                    Status.SUCCESS
-                } else {
-                    Status.FAILURE
+                    posters.addAll(it)
+                    insertAllPosterToLocalStorage(it)
+                    numberOfPagesLoaded += 1
+                    liveData.value = Status.SUCCESS
+                }
+                if (list == null) {
+                    liveData.value = Status.FAILURE
                 }
             }
         } else {
@@ -53,23 +59,15 @@ class PostersFragmentViewModel(application: Application) : BaseViewModel(applica
         }
     }
 
-    private suspend fun fetchPostersInBackGround() = withContext(Dispatchers.Default) {
-        val posts = repository.getPosters()
-        posts?.let {
-            this@PostersFragmentViewModel.posters.addAll(it)
-            return@withContext
-        }
-        if (posts.isNullOrEmpty()) {
-            isApiCallSuccess = false
-        }
+    private suspend fun getPostersFromRemoteStorage(): ArrayList<Poster>? = withContext(Dispatchers.IO) {
+        return@withContext repository.getPosters()
     }
 
 
-    fun getAllPosters() {
+    fun getAllPostersFromLocalStorage() {
         uiScope.launch {
             var list: List<Poster>? = null
             val query = async(Dispatchers.IO) {
-                // Async stuff
                 list = PosterLocalRepo.getAllPoster(getApplication())
             }
             query.await()
@@ -81,20 +79,18 @@ class PostersFragmentViewModel(application: Application) : BaseViewModel(applica
         }
     }
 
-    private fun insertAllPoster(posters: List<Poster>) {
+    private fun insertAllPosterToLocalStorage(posters: List<Poster>) {
         uiScope.launch {
             val query = async(Dispatchers.IO) {
-                // Async stuff
                 PosterLocalRepo.insertAllPoster(getApplication(), posters)
             }
             query.await()
         }
     }
 
-    private fun clearAllPosters() {
+    private fun clearAllPostersInLocalStorage() {
         uiScope.launch {
             val query = async(Dispatchers.IO) {
-                // Async stuff
                 PosterLocalRepo.clearAllPosters(getApplication())
             }
             query.await()

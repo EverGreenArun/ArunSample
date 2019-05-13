@@ -9,6 +9,11 @@
             android:focusable="true"
             android:background="@android:color/white"
             tools:context=".ui.DetailScreenFragment">
+        <TextView
+                android:id="@+id/tVMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/MessageTextStyle"/>
         <WebView
                 android:id="@+id/webPage"
                 android:layout_width="match_parent"

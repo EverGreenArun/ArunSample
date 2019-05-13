@@ -50,10 +50,8 @@ class PostViewHolder(private val binding: ViewHolderPosterBinding, private val o
 
 
         poster.user?.profileImage?.medium?.let {
-            val imageRequest:ImageRequest = ImageRequestBuilder
-                    .newBuilderWithSource(Uri.parse(it))
-                .setProgressiveRenderingEnabled(true)
-                .setLocalThumbnailPreviewsEnabled(true)
+            val imageRequest: ImageRequest = ImageRequestBuilder
+                .newBuilderWithSource(Uri.parse(it))
                 .build()
 
             Fresco.getImagePipeline().prefetchToBitmapCache(imageRequest, binding.iVProfile.context)
@@ -61,7 +59,6 @@ class PostViewHolder(private val binding: ViewHolderPosterBinding, private val o
             binding.iVProfile.controller = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(imageRequest)
                 .setOldController(binding.iVProfile.controller)
-                .setAutoPlayAnimations(false)
                 .build()
 
         }

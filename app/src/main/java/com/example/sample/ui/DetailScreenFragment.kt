@@ -13,6 +13,7 @@ import com.example.sample.base.BaseViewModel
 import com.example.sample.databinding.FragmentDetailScreenBinding
 import com.example.sample.pojo.DetailScreenData
 import android.webkit.WebViewClient
+import com.example.sample.R
 
 
 class DetailScreenFragment : BaseFragment<ViewDataBinding, BaseViewModel>() {
@@ -65,6 +66,9 @@ class DetailScreenFragment : BaseFragment<ViewDataBinding, BaseViewModel>() {
                 dataBinding.webPage.settings.loadWithOverviewMode = true
                 dataBinding.webPage.webViewClient = WebViewClient()
                 dataBinding.webPage.loadUrl(it.fileUri)
+            } else {
+                dataBinding.tVMessage.text = getString(R.string.network_issue)
+                dataBinding.tVMessage.visibility = View.VISIBLE
             }
         }
     }

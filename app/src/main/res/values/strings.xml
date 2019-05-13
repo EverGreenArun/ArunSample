@@ -3,6 +3,7 @@
 
     <string name="posters">Posters</string>
     <string name="web">Shop Page</string>
+    <string name="loading">Loading.....</string>
     <string name="network_issue">Some issue on network, Please check connection</string>
     <string name="api_call_failure">Service currently unavailable</string>
     <string name="no_more_data">Already loaded all poster</string>

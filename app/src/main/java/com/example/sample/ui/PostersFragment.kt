@@ -1,7 +1,6 @@
 package com.example.sample.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -112,15 +111,12 @@ class PostersFragment : BaseFragment<ViewDataBinding, BaseViewModel>() {
     private fun loadData() {
         if (isNetworkConnected()) {
             isLoading = true
-            dataBinding.tVMessage.visibility = View.GONE
-            viewModel.fetchPosters()
-            Log.i("loadData", "isNetworkConnected true")
+            showMessage(true, getString(R.string.loading))
+            viewModel.getPosters()
         } else {
-            Log.i("loadData", "isNetworkConnected false")
             showOfflineMessage()
             if (!viewModel.offlineDataLoaded) {
-                Log.i("loadData", "offlineDataLoaded false")
-                viewModel.getAllPosters()
+                viewModel.getAllPostersFromLocalStorage()
                 viewModel.offlineDataLoaded = true
             }
         }
@@ -135,18 +131,16 @@ class PostersFragment : BaseFragment<ViewDataBinding, BaseViewModel>() {
                         dataBinding.recyclerPoster.post {
                             postAdapter.notifyDataSetChanged()
                         }
-                        dataBinding.tVMessage.visibility = View.GONE
                         viewModel.offlineDataLoaded = false
+                        showMessage(false)
                     }
                     Status.FAILURE -> {
                         isLoading = false
-                        dataBinding.tVMessage.visibility = View.VISIBLE
-                        dataBinding.tVMessage.text = getString(R.string.api_call_failure)
+                        showMessage(true, getString(R.string.api_call_failure))
                     }
                     Status.NO_MORE_DATA -> {
                         isLoading = false
-                        dataBinding.tVMessage.visibility = View.VISIBLE
-                        dataBinding.tVMessage.text = getString(R.string.no_more_data)
+                        showMessage(true, getString(R.string.no_more_data))
                     }
                     Status.OLD_DATA -> {
                         showOfflineMessage()
@@ -158,15 +152,21 @@ class PostersFragment : BaseFragment<ViewDataBinding, BaseViewModel>() {
     }
 
     private fun showOfflineMessage() {
-        dataBinding.tVMessage.visibility = View.VISIBLE
         if (viewModel.posters.size == 0) {
-            dataBinding.tVMessage.text = getString(R.string.empty_offline_data)
+            showMessage(true, getString(R.string.empty_offline_data))
         } else {
-            dataBinding.tVMessage.text = getString(R.string.showing_offline_data)
+            showMessage(true, getString(R.string.showing_offline_data))
         }
-        dataBinding.recyclerPoster.post {
-            postAdapter.notifyDataSetChanged()
+        dataBinding.recyclerPoster.post { postAdapter.notifyDataSetChanged() }
+    }
+
+    private fun showMessage(isShow: Boolean, message: String = "") {
+        dataBinding.tVMessage.visibility = if (isShow) {
+            View.VISIBLE
+        } else {
+            View.GONE
         }
+        dataBinding.tVMessage.text = message
     }
 }
 
