@@ -1,17 +1,16 @@
 package com.example.sample.ui
 
 import android.app.Application
-import androidx.annotation.UiThread
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.sample.base.BaseViewModel
-import com.example.sample.database.Coroutines
 import com.example.sample.network.ApiFactory
 import com.example.sample.pojo.Poster
 import com.example.sample.repo.PosterLocalRepo
 import com.example.sample.repo.PosterRemoteRepo
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -32,10 +31,10 @@ class PostersFragmentViewModel(application: Application) : BaseViewModel(applica
 
     fun fetchPosters() {
         if (pageCount < 10) {
+            if (pageCount == 0) {
+                getAllPosters()
+            }
             uiScope.launch {
-                if (pageCount == 0) {
-                    getAllPosters()
-                }
                 isApiCallSuccess = true
                 fetchPostersInBackGround()
                 liveData.value = if (isApiCallSuccess) {
@@ -65,43 +64,41 @@ class PostersFragmentViewModel(application: Application) : BaseViewModel(applica
         }
     }
 
-    @UiThread
-    fun initDb(){
-        Coroutines.ioThenMain({
-            PosterLocalRepo.insertAllPoster(getApplication(),ArrayList())
-        }) {
-        }
-    }
 
-    @UiThread
     fun getAllPosters() {
-        Coroutines.ioThenMain({
-            PosterLocalRepo.getAllPoster(getApplication())
-        }) { list ->
-            list?.apply {
+        uiScope.launch {
+            var list: List<Poster>? = null
+            val query = async(Dispatchers.IO) {
+                // Async stuff
+                list = PosterLocalRepo.getAllPoster(getApplication())
+            }
+            query.await()
+            list?.let {
                 posters.clear()
-                posters.addAll(this)
+                posters.addAll(it)
+                liveData.value = Status.OLD_DATA
             }
         }
-        liveData.value = Status.OLD_DATA
     }
 
-    @UiThread
-    fun insertAllPoster(posters: List<Poster>) {
-        Coroutines.ioThenMain({
-            PosterLocalRepo.insertAllPoster(getApplication(), posters)
-        }) {
+    private fun insertAllPoster(posters: List<Poster>) {
+        uiScope.launch {
+            val query = async(Dispatchers.IO) {
+                // Async stuff
+                PosterLocalRepo.insertAllPoster(getApplication(), posters)
+            }
+            query.await()
         }
-        return
     }
 
-    @UiThread
-    fun clearAllPosters() {
-        Coroutines.ioThenMain({
-            PosterLocalRepo.clearAllPosters(getApplication())
-        }) {
+    private fun clearAllPosters() {
+        uiScope.launch {
+            val query = async(Dispatchers.IO) {
+                // Async stuff
+                PosterLocalRepo.clearAllPosters(getApplication())
+            }
+            query.await()
         }
-        return
     }
 
     class PostersFragmentViewModelFactory(private val application: Application) : ViewModelProvider.Factory {

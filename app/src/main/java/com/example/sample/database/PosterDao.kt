@@ -8,8 +8,8 @@ import com.example.sample.pojo.Poster
 
 @Dao
 interface PosterDao {
-    @get:Query("SELECT * FROM poster")
-    val getAllPoster: List<Poster>
+    @Query("SELECT * FROM poster")
+    fun getGetAllPoster(): List<Poster>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertPoster(product: Poster)

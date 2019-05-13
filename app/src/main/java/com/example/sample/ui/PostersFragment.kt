@@ -49,17 +49,16 @@ class PostersFragment : BaseFragment<ViewDataBinding, BaseViewModel>() {
         return dataBinding
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        initLiveDataObserver()
-        viewModel.initDb()
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setPosterAdapter()
         setRecyclerViewDivider()
         setLoadMoreListener()
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        initLiveDataObserver()
     }
 
     override fun onResume() {
