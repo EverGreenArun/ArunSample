@@ -49,9 +49,10 @@ class PostersFragment : BaseFragment<ViewDataBinding, BaseViewModel>() {
         return dataBinding
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         initLiveDataObserver()
+        viewModel.initDb()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -67,9 +68,9 @@ class PostersFragment : BaseFragment<ViewDataBinding, BaseViewModel>() {
     }
 
     private fun setLoadMoreListener() {
-        dataBinding.recyclerPost.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        dataBinding.recyclerPoster.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             val visibleThreshold = 5
-            val linearLayoutManager = dataBinding.recyclerPost.layoutManager as LinearLayoutManager
+            val linearLayoutManager = dataBinding.recyclerPoster.layoutManager as LinearLayoutManager
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 val totalItemCount = linearLayoutManager.itemCount
@@ -86,7 +87,7 @@ class PostersFragment : BaseFragment<ViewDataBinding, BaseViewModel>() {
         activity?.applicationContext?.let { context ->
             ContextCompat.getDrawable(context, R.drawable.divider)?.let { drawable ->
                 itemDecorator.setDrawable(drawable)
-                dataBinding.recyclerPost.addItemDecoration(itemDecorator)
+                dataBinding.recyclerPoster.addItemDecoration(itemDecorator)
             }
         }
     }
@@ -106,7 +107,7 @@ class PostersFragment : BaseFragment<ViewDataBinding, BaseViewModel>() {
             }
         })
 
-        dataBinding.recyclerPost.adapter = postAdapter
+        dataBinding.recyclerPoster.adapter = postAdapter
     }
 
     private fun loadData() {
@@ -132,7 +133,9 @@ class PostersFragment : BaseFragment<ViewDataBinding, BaseViewModel>() {
                 when (status) {
                     Status.SUCCESS -> {
                         isLoading = false
-                        postAdapter.notifyDataSetChanged()
+                        dataBinding.recyclerPoster.post {
+                            postAdapter.notifyDataSetChanged()
+                        }
                         dataBinding.tVMessage.visibility = View.GONE
                         viewModel.offlineDataLoaded = false
                     }
@@ -162,7 +165,9 @@ class PostersFragment : BaseFragment<ViewDataBinding, BaseViewModel>() {
         } else {
             dataBinding.tVMessage.text = getString(R.string.showing_offline_data)
         }
-        postAdapter.notifyDataSetChanged()
+        dataBinding.recyclerPoster.post {
+            postAdapter.notifyDataSetChanged()
+        }
     }
 }
 

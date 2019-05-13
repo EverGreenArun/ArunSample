@@ -65,19 +65,25 @@ class PostersFragmentViewModel(application: Application) : BaseViewModel(applica
         }
     }
 
+    @UiThread
+    fun initDb(){
+        Coroutines.ioThenMain({
+            PosterLocalRepo.insertAllPoster(getApplication(),ArrayList())
+        }) {
+        }
+    }
 
     @UiThread
     fun getAllPosters() {
         Coroutines.ioThenMain({
             PosterLocalRepo.getAllPoster(getApplication())
         }) { list ->
-            list?.let {
+            list?.apply {
                 posters.clear()
-                posters.addAll(it)
+                posters.addAll(this)
             }
         }
         liveData.value = Status.OLD_DATA
-        return
     }
 
     @UiThread

@@ -16,7 +16,7 @@
                 android:visibility="gone"/>
 
         <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_post"
+                android:id="@+id/recycler_poster"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"

@@ -7,6 +7,11 @@ import com.example.sample.pojo.Poster
 
 object PosterLocalRepo {
     @WorkerThread
+    fun initDB(context: Context) {
+        AppDatabase.getInstance(context).posterDao().getAllPoster
+    }
+
+    @WorkerThread
     fun getAllPoster(context: Context) : List<Poster> = AppDatabase.getInstance(context).posterDao().getAllPoster
 
     @WorkerThread
